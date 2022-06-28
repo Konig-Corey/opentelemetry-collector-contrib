@@ -11,6 +11,7 @@ receivers:
             attribute_columns: [ "type" ]
             data_type: gauge
             value_type: int
+            aggregation: cumulative
             tags: 
               foo: bar
 exporters:

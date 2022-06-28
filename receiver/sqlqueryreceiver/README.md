@@ -25,11 +25,12 @@ Each _metric_ in the configuration will produce one OTel metric per row returned
 * `value_column`(required): the column name in the returned dataset used to set the value of the metric's datapoint. The column's values must be of an integer type.
 * `attribute_columns`(optional): a list of column names in the returned dataset used to set attibutes on the datapoint.
 * `data_type` (optional): can be `gauge` or `sum`; defaults to `gauge`.
-* `value_type` (optional): can be `int` or `float`; defaults to `int`.
-* `monotonic` (optional): boolean; whether a cumulative sum's value is monotonically increasing (i.e. never rolls over or resets); defaults to false.
-* `aggregation` (optional): can be `cumulative` or `delta`; defaults to `cumulative`.
+* `value_type` (optional): can be `int` or `double`; defaults to `int`.
+* `monotonic` (optional): boolean; whether a cumulative sum's value is monotonically increasing (i.e. never rolls over or resets); defaults to false. This will fail validation if you attempt to set this field while `data_type` is set to `gauge`.
+* `aggregation` (optional): can be `cumulative` or `delta`; This will fail validation if you attempt to set this field while `data_type` is set to `gauge`.
 * `description` (optional): the description applied to the metric.
 * `unit` (optional): the units applied to the metric.
+* `tags` (optional): additional tags/labels to be applied to the metric(s)
 
 ### Example
 
@@ -44,6 +45,8 @@ receivers:
           - metric_name: movie.genres
             value_column: "count"
             attribute_columns: [ "genre" ]
+            tags: 
+               dbinstancename: movie-db
 ```
 
 Given a `movie` table with three rows:
@@ -72,6 +75,7 @@ Descriptor:
 NumberDataPoints #0
 Data point attributes:
      -> genre: STRING(sci-fi)
+     -> dbinstancename: STRING(movie-db)
 Value: 2
 
 Metric #1
@@ -81,5 +85,6 @@ Descriptor:
 NumberDataPoints #0
 Data point attributes:
      -> genre: STRING(action)
+     -> dbinstancename: STRING(movie-db)     
 Value: 1
 ```

@@ -80,6 +80,7 @@ type MetricCfg struct {
 	Aggregation      MetricAggregation `mapstructure:"aggregation"`
 	Unit             string            `mapstructure:"unit"`
 	Description      string            `mapstructure:"description"`
+	Tags             map[string]string `mapstructure:"tags"`
 }
 
 func (c MetricCfg) Validate() error {
@@ -101,6 +102,11 @@ func (c MetricCfg) Validate() error {
 	}
 	if errs != nil && c.MetricName != "" {
 		errs = multierr.Append(fmt.Errorf("invalid metric config with metric_name '%s'", c.MetricName), errs)
+	}
+	if c.DataType == MetricDataTypeGauge {
+		if c.Aggregation != "" || c.Monotonic {
+			errs = multierr.Append(fmt.Errorf("metric config: 'aggregate' and/or 'monotonic' cannot be set when 'data_type' is set to 'gauge'"), errs)
+		}
 	}
 	return errs
 }
@@ -126,7 +132,7 @@ type MetricValueType string
 const (
 	MetricValueTypeUnspecified MetricValueType = ""
 	MetricValueTypeInt         MetricValueType = "int"
-	MetricValueTypeFloat       MetricValueType = "float"
+	MetricValueTypeFloat       MetricValueType = "double"
 )
 
 func (t MetricValueType) Validate() error {

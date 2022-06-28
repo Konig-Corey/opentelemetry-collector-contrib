@@ -44,10 +44,10 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, "val.count", metric.MetricName)
 	assert.Equal(t, "count", metric.ValueColumn)
 	assert.Equal(t, "type", metric.AttributeColumns[0])
+	assert.Equal(t, map[string]string{"foo": "bar"}, metric.Tags)
 	assert.Equal(t, false, metric.Monotonic)
 	assert.Equal(t, MetricDataTypeGauge, metric.DataType)
 	assert.Equal(t, MetricValueTypeInt, metric.ValueType)
-	assert.Equal(t, MetricAggregationCumulative, metric.Aggregation)
 }
 
 func TestValidateConfig_Invalid(t *testing.T) {
@@ -94,6 +94,14 @@ func TestValidateConfig_Invalid(t *testing.T) {
 		{
 			fname:     "config-invalid-missing-datasource.yaml",
 			errSubstr: "'datasource' cannot be empty",
+		},
+		{
+			fname:     "config-conflicting-aggregation.yaml",
+			errSubstr: "metric config: 'aggregate' and/or 'monotonic' cannot be set when 'data_type' is set to 'gauge'",
+		},
+		{
+			fname:     "config-conflicting-monotonic.yaml",
+			errSubstr: "metric config: 'aggregate' and/or 'monotonic' cannot be set when 'data_type' is set to 'gauge'",
 		},
 	}
 	for _, test := range tests {
